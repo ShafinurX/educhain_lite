@@ -1,8 +1,8 @@
 // ============================================================
 // FILE: lib/screens/verify_screen.dart
-// PURPOSE: Employer Verification Mode.
-//          - Scans Certificate QR -> Shows VALID/INVALID certificate details.
-//          - Scans Student Profile QR -> Shows verified Student Academic Profile.
+// PURPOSE: Employer Verification Mode (V2.0)
+//          - Scans Certificate QR -> Shows VALID/EXPIRED/REVOKED
+//          - Scans Student Profile QR -> Shows verified profile
 //          No login required.
 // ============================================================
 
@@ -30,7 +30,6 @@ class _VerifyScreenState extends State<VerifyScreen> {
     super.dispose();
   }
 
-
   Future<void> _verifyByHash(String hash) async {
     setState(() {
       _isVerifying = true;
@@ -45,7 +44,6 @@ class _VerifyScreenState extends State<VerifyScreen> {
       _verifyResult = result;
     });
   }
-
 
   Future<void> _verifyProfileById(String studentId) async {
     setState(() {
@@ -71,12 +69,10 @@ class _VerifyScreenState extends State<VerifyScreen> {
             _hashController.text = rawData;
 
             if (rawData.contains('|')) {
-
               String hash = rawData.split('|')[1];
               _hashController.text = hash;
               _verifyByHash(hash);
             } else {
-
               _verifyProfileById(rawData);
             }
           },
@@ -97,7 +93,6 @@ class _VerifyScreenState extends State<VerifyScreen> {
         padding: const EdgeInsets.all(20),
         child: Column(
           children: [
-
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
@@ -138,10 +133,7 @@ class _VerifyScreenState extends State<VerifyScreen> {
                 ],
               ),
             ),
-
             const SizedBox(height: 24),
-
-
             const _StepCard(
               step: '1',
               text: 'Ask the student to show their Certificate or Profile QR',
@@ -157,27 +149,25 @@ class _VerifyScreenState extends State<VerifyScreen> {
               text: 'Or paste the SHA-256 hash below and tap Verify',
               color: Color(0xFFEA4335),
             ),
-
             const SizedBox(height: 24),
-
-
             ElevatedButton.icon(
               onPressed: _startQRScan,
               icon: const Icon(Icons.qr_code_scanner_rounded, color: Colors.white),
-              label: const Text('Scan QR Code (Camera)', style: TextStyle(color: Colors.white)),
+              label: const Text('Scan QR Code (Camera)',
+                  style: TextStyle(color: Colors.white)),
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF1A73E8),
                 minimumSize: const Size(double.infinity, 54),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12)),
               ),
             ),
-
             const Padding(
               padding: EdgeInsets.symmetric(vertical: 16.0),
-              child: Text("OR", style: TextStyle(fontWeight: FontWeight.bold, color: Colors.grey)),
+              child: Text("OR",
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold, color: Colors.grey)),
             ),
-
-
             const Align(
               alignment: Alignment.centerLeft,
               child: Text(
@@ -205,18 +195,18 @@ class _VerifyScreenState extends State<VerifyScreen> {
                 ),
               ),
             ),
-
             const SizedBox(height: 16),
-
-
             _isVerifying
                 ? const Center(
-              child: CircularProgressIndicator(color: Color(0xFF34A853)),
+              child:
+              CircularProgressIndicator(color: Color(0xFF34A853)),
             )
                 : ElevatedButton.icon(
               onPressed: () => _verifyByHash(_hashController.text),
-              icon: const Icon(Icons.verified_user_rounded, color: Colors.white),
-              label: const Text('Verify Certificate', style: TextStyle(color: Colors.white)),
+              icon: const Icon(Icons.verified_user_rounded,
+                  color: Colors.white),
+              label: const Text('Verify Certificate',
+                  style: TextStyle(color: Colors.white)),
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF34A853),
                 minimumSize: const Size(double.infinity, 52),
@@ -229,8 +219,8 @@ class _VerifyScreenState extends State<VerifyScreen> {
             if (_verifyResult != null) ...[
               const SizedBox(height: 24),
               _isProfileResult
-                  ? _ProfileVerificationResult(result: _verifyResult!) // প্রোফাইল কিউআর স্ক্যান রেজাল্ট
-                  : _VerificationResult(result: _verifyResult!),     // সার্টিফিকেট কিউআর স্ক্যান রেজাল্ট
+                  ? _ProfileVerificationResult(result: _verifyResult!)
+                  : _VerificationResult(result: _verifyResult!),
             ],
           ],
         ),
@@ -239,7 +229,9 @@ class _VerifyScreenState extends State<VerifyScreen> {
   }
 }
 
-
+// ============================================================
+// SCANNER PAGE
+// ============================================================
 class ScannerPage extends StatefulWidget {
   final Function(String) onScanCompleted;
   const ScannerPage({super.key, required this.onScanCompleted});
@@ -249,7 +241,7 @@ class ScannerPage extends StatefulWidget {
 }
 
 class _ScannerPageState extends State<ScannerPage> {
-  bool _hasScanned = false; // লক ভ্যারিয়েবল (এটি ডাবল স্ক্যান হওয়া রোধ করবে)
+  bool _hasScanned = false;
 
   @override
   Widget build(BuildContext context) {
@@ -276,13 +268,16 @@ class _ScannerPageState extends State<ScannerPage> {
   }
 }
 
-
+// ============================================================
+// STEP CARD
+// ============================================================
 class _StepCard extends StatelessWidget {
   final String step;
   final String text;
   final Color color;
 
-  const _StepCard({required this.step, required this.text, required this.color});
+  const _StepCard(
+      {required this.step, required this.text, required this.color});
 
   @override
   Widget build(BuildContext context) {
@@ -312,12 +307,16 @@ class _StepCard extends StatelessWidget {
             child: Text(
               step,
               style: const TextStyle(
-                  color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16),
             ),
           ),
           const SizedBox(width: 12),
           Expanded(
-            child: Text(text, style: TextStyle(color: Colors.grey.shade700, fontSize: 13)),
+            child: Text(text,
+                style:
+                TextStyle(color: Colors.grey.shade700, fontSize: 13)),
           ),
         ],
       ),
@@ -325,7 +324,9 @@ class _StepCard extends StatelessWidget {
   }
 }
 
-
+// ============================================================
+// CERTIFICATE VERIFICATION RESULT (V2.0 - with Expiry + Revocation)
+// ============================================================
 class _VerificationResult extends StatelessWidget {
   final Map<String, dynamic> result;
 
@@ -333,16 +334,43 @@ class _VerificationResult extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bool isValid = result['status'] == 'valid' ||
-        result['success'] == true ||
-        result['success'] == 'true';
+    // Determine status: valid / expired / revoked / invalid
+    final String status = result['status'] ?? 'invalid';
 
-    final color = isValid ? Colors.green : Colors.red;
-    final icon = isValid ? Icons.check_circle_rounded : Icons.cancel_rounded;
-    final title = isValid ? '✓ Certificate is VALID' : '✗ Certificate is TAMPERED / INVALID';
-    final subtitle = isValid
-        ? 'This certificate is authentic and has not been modified.'
-        : 'This certificate could not be verified. It may be forged or modified.';
+    Color color;
+    IconData icon;
+    String title;
+    String subtitle;
+
+    switch (status) {
+      case 'valid':
+        color = Colors.green;
+        icon = Icons.check_circle_rounded;
+        title = '✓ Certificate is VALID';
+        subtitle =
+        'This certificate is authentic and has not been modified.';
+        break;
+      case 'expired':
+        color = Colors.orange;
+        icon = Icons.access_time_rounded;
+        title = '⏰ Certificate has EXPIRED';
+        subtitle = result['message'] ??
+            'This certificate has passed its expiry date.';
+        break;
+      case 'revoked':
+        color = Colors.red;
+        icon = Icons.cancel_rounded;
+        title = '✗ Certificate is REVOKED';
+        subtitle = result['message'] ??
+            'This certificate has been revoked by the issuing institution.';
+        break;
+      default:
+        color = Colors.red;
+        icon = Icons.gpp_bad_rounded;
+        title = '✗ Certificate is INVALID';
+        subtitle =
+        'This certificate could not be verified. It may be forged or modified.';
+    }
 
     final data = result['data'] ?? result['certificate'];
 
@@ -373,7 +401,7 @@ class _VerificationResult extends StatelessWidget {
             style: TextStyle(color: Colors.grey.shade700, fontSize: 13),
             textAlign: TextAlign.center,
           ),
-          if (isValid && data != null) ...[
+          if ((status == 'valid' || status == 'expired' || status == 'revoked') && data != null) ...[
             const SizedBox(height: 16),
             const Divider(),
             const SizedBox(height: 8),
@@ -381,6 +409,10 @@ class _VerificationResult extends StatelessWidget {
             _ResultRow('Certificate', data['title'] ?? '-'),
             _ResultRow('Issued By', data['issuing_org'] ?? '-'),
             _ResultRow('Issue Date', data['issue_date'] ?? '-'),
+            if (data['expiry_date'] != null && data['expiry_date'] != '')
+              _ResultRow('Expiry Date', data['expiry_date']),
+            if (status == 'revoked')
+              _ResultRow('Status', 'REVOKED'),
           ],
         ],
       ),
@@ -388,7 +420,9 @@ class _VerificationResult extends StatelessWidget {
   }
 }
 
-
+// ============================================================
+// PROFILE VERIFICATION RESULT
+// ============================================================
 class _ProfileVerificationResult extends StatelessWidget {
   final Map<String, dynamic> result;
 
@@ -454,7 +488,9 @@ class _ProfileVerificationResult extends StatelessWidget {
   }
 }
 
-// ---- RESULT ROW HELPER ----
+// ============================================================
+// RESULT ROW HELPER
+// ============================================================
 class _ResultRow extends StatelessWidget {
   final String label;
   final String value;

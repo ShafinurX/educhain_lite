@@ -1,15 +1,15 @@
-
-
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../models/student.dart';
 import '../models/certificate.dart';
 
 class ApiService {
-  static const String _baseUrl = 'http://192.168.0.200/educhain_api';
+  // ⚠️ CHANGE THIS to your PC's IPv4 Address
+  static const String _baseUrl = 'http://192.168.0.199/educhain_api';
 
-
-
+  // ----------------------------------------------------------
+  // SIGN UP
+  // ----------------------------------------------------------
   static Future<Map<String, dynamic>> signUp(Student student) async {
     try {
       final response = await http.post(
@@ -23,7 +23,9 @@ class ApiService {
     }
   }
 
-
+  // ----------------------------------------------------------
+  // LOGIN
+  // ----------------------------------------------------------
   static Future<Map<String, dynamic>> login(String email, String password) async {
     try {
       final response = await http.post(
@@ -37,8 +39,9 @@ class ApiService {
     }
   }
 
-
-
+  // ----------------------------------------------------------
+  // GET PROFILE
+  // ----------------------------------------------------------
   static Future<Map<String, dynamic>> getProfile(String studentId) async {
     try {
       final response = await http.get(
@@ -50,7 +53,9 @@ class ApiService {
     }
   }
 
-
+  // ----------------------------------------------------------
+  // UPDATE PROFILE
+  // ----------------------------------------------------------
   static Future<Map<String, dynamic>> updateProfile(Student student) async {
     try {
       final response = await http.post(
@@ -64,9 +69,9 @@ class ApiService {
     }
   }
 
-
-
-
+  // ----------------------------------------------------------
+  // ADD CERTIFICATE
+  // ----------------------------------------------------------
   static Future<Map<String, dynamic>> addCertificate(Certificate cert) async {
     try {
       final response = await http.post(
@@ -80,7 +85,9 @@ class ApiService {
     }
   }
 
-
+  // ----------------------------------------------------------
+  // GET CERTIFICATES
+  // ----------------------------------------------------------
   static Future<List<Certificate>> getCertificates(String studentId) async {
     try {
       final response = await http.get(
@@ -98,7 +105,9 @@ class ApiService {
     }
   }
 
-
+  // ----------------------------------------------------------
+  // VERIFY CERTIFICATE (V2.0 - with expiry + revocation)
+  // ----------------------------------------------------------
   static Future<Map<String, dynamic>> verifyCertificate(String hash) async {
     try {
       final response = await http.get(
@@ -107,6 +116,39 @@ class ApiService {
       return jsonDecode(response.body);
     } catch (e) {
       return {'success': false, 'message': 'Network error: ${e.toString()}'};
+    }
+  }
+
+  // ----------------------------------------------------------
+  // TOGGLE REVOKE (Admin only) — NEW
+  // ----------------------------------------------------------
+  static Future<Map<String, dynamic>> toggleRevoke(int certId, String action) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$_baseUrl/toggle_revoke.php'),
+        body: {'cert_id': certId.toString(), 'action': action},
+      );
+      return jsonDecode(response.body);
+    } catch (e) {
+      return {'success': false, 'message': 'Network error: ${e.toString()}'};
+    }
+  }
+
+  // ----------------------------------------------------------
+  // GET VERIFICATION HISTORY — NEW
+  // ----------------------------------------------------------
+  static Future<List<dynamic>> getVerificationHistory(String studentId) async {
+    try {
+      final response = await http.get(
+        Uri.parse('$_baseUrl/get_verification_history.php?student_id=$studentId'),
+      );
+      final data = jsonDecode(response.body);
+      if (data['success'] == true) {
+        return data['history'] ?? [];
+      }
+      return [];
+    } catch (e) {
+      return [];
     }
   }
 }
